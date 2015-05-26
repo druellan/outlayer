@@ -136,10 +136,8 @@ Outlayer.prototype.option = function( opts ) {
 
 Outlayer.prototype._create = function() {
   // get items from children
-  this.reloadItems();
-  // elements that affect layout, but are not laid out
-  this.stamps = [];
-  this.stamp( this.options.stamp );
+  this.reloadContent();
+
   // set container style
   utils.extend( this.element.style, this.options.containerStyle );
 
@@ -155,6 +153,18 @@ Outlayer.prototype.reloadItems = function() {
   this.items = this._itemize( this.element.children );
 };
 
+// goes through all children again and gets bricks in proper order
+// // also, detect new locked and stamped items
+Outlayer.prototype.reloadContent = function() {
+  // collection of item elements
+  this.reloadItems();
+  // elements that affect layout, but are not laid out
+  this.stamps = [];
+  this.stamp( this.options.stamp );
+  // elements that affect layout, are laid out, but do not react at dragging events
+  this.locks = [];
+  this.lock( this.options.lock );
+};
 
 /**
  * turn elements into Outlayer.Items to be used in layout
@@ -525,6 +535,18 @@ Outlayer.prototype.unstamp = function( elems ) {
     this.unignore( elem );
   }
 
+};
+
+/**
+* adds elements to locks
+* @param {NodeList, Array, Element, or String} elems
+*/
+Outlayer.prototype.lock = function( elems ) {
+  elems = this._find( elems );
+  if ( !elems ) {
+    return;
+  }
+  this.locks = this.locks.concat( elems );
 };
 
 /**
